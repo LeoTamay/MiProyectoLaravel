@@ -40,3 +40,4 @@ Route::get('/nacimiento/{edad}/{mes}', function ($edad, $mesing) {
     return " Tiene {$edad} años";
 
 });
+
