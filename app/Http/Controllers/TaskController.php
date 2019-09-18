@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\task;
+use Validator;
 
 class TaskController extends Controller
 {
@@ -30,12 +31,34 @@ class TaskController extends Controller
         return response()->json( ["tasks" => $tasks]);    
     }
 
-    public function show($new){
-        $tasks = [$new]; 
+    public function show($id){
+        $tasks = Task::where('id', $id)->get(); 
+        //tasks = Task::find($id);
+        if (!isset($tasks)){
+            return response()->json( ["message"=> "Task not finded"] );
+        }
         return response()->json( ["tasks" => $tasks]);
     }
 
-    public function store(){
-        return response()->json( ["show message"=>"Se guardo la tarea correctamente" ]);
+    public function store( Request $request){
+        
+        //return response()->json( ["show message"=>"Se guardo la tarea correctamente" ]);
+        $validator = Validator::make($request->all(),[
+            'name'=> 'required|unique:tasks'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 422);
+        }
+
+        $task = new Task;
+
+        $task->name = $request-> name;
+        $task->description = $request-> description;
+        $task->priority = $request-> priority;
+        $task->status = $request-> status;
+
+        $task->save();
+        return response()->json( ["tasks" => $task]);
     }
 }
